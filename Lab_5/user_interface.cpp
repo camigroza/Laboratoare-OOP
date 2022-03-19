@@ -1,6 +1,7 @@
 #include "user_interface.h"
 #include "entitate.h"
 #include "repository.h"
+#include "operations.h"
 #include <iostream>
 using namespace std;
 
@@ -28,7 +29,7 @@ void run_menu()
 		}
 		else if (optiune == 2)
 		{
-			cout << "Dati numarul complex de sters" << endl;
+			cout << "\tDati numarul complex de sters:" << endl;
 			e.readEntitate();
 			repo.remove(e);
 		}
@@ -37,21 +38,41 @@ void run_menu()
 			if (repo.getNrEntitati() != 0)
 				for (int i = 0; i < repo.getNrEntitati(); i++)
 					repo.elemAt(i).writeEntitate();
-			else cout << "Nu exista entitati in repository!\n";
+			else cout << "\tNu exista entitati in repository!\n";
 		}
 		else if (optiune == 4)
 		{
 			if (repo.getNrEntitati() != 0)
 			{
-				cout << "Cea mai mare entitate este: ";
+				cout << "\tCea mai mare entitate este: ";
 				e = repo.biggestEntity();
 				e.writeEntitate();
 			}
-			else cout << "Nu exista entitati in repository!\n";
+			else cout << "\tNu exista entitati in repository!\n";
 		}
-		//else if (optiune == 5)
-
-		//if(optiune == 6)
-		//if(optiune == 7)
+		else if (optiune == 5)
+		{
+			Entitate* v = new Entitate[repo.getNrEntitati()];
+			int len = 0;
+			all_in_first_quadrant(repo, v, len);
+			if (len == 0) cout << "\tNu exista entitati situate in primul cadran!\n";
+			else
+			{
+				cout << "\tEntitatile situate in primul cadran sunt:\n";
+				for (int i = 0; i < len; i++)
+					v[i].writeEntitate();
+			}
+			delete[] v;
+		}
+		else if (optiune == 6)
+		{
+			int start, end;
+			max_secv_entitati_egale(repo, start, end);
+			cout << "\tCea mai lunga secventa de entitati egale este formata din:\n";
+			for (int i = start; i <= end; i++)
+				repo.elemAt(i).writeEntitate();
+		}
+		else if (optiune == 7) break;
+		else cout << "\tOptiune gresita! Reincercati:\n";
 	}
 }

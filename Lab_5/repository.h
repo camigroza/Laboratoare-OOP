@@ -3,7 +3,7 @@
 
 class Repository {
 private:
-	Entitate* entitati;
+	Entitate* entitati = nullptr;
 	int nr_entitati;
 	int capacitate;
 	void resize();
@@ -56,6 +56,4 @@ public:
 	/// </summary>
 	/// <returns> cel mai mare numar complex din repository </returns>
 	Entitate& biggestEntity();
-
-
 };

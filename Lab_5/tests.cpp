@@ -3,6 +3,7 @@
 #include "entitate.h"
 #include "assert.h"
 #include "repository.h"
+#include "operations.h"
 using namespace std;
 
 void test_constructori()
@@ -141,9 +142,63 @@ void test_biggestEntity()
 	assert(repo.biggestEntity() == e2);
 }
 
-void test_allInFirstQuadrant()
+void test_all_in_first_quadrant()
 {
-	
+	int len = 0;
+	Repository repo;
+	Entitate* v = new Entitate[10];
+	Entitate e1(1, 2);
+	Entitate e2(-1, 2);
+	Entitate e3(1, -2);
+	Entitate e4(-1, -2);
+	Entitate e5(3, 4);
+	repo.add(e2);
+	repo.add(e3);
+	repo.add(e4);
+	all_in_first_quadrant(repo, v, len);
+	assert(len == 0);
+	repo.add(e1);
+	repo.add(e5);
+	all_in_first_quadrant(repo, v, len);
+	assert(len == 2);
+	assert(v[0] == e1);
+	assert(v[1] == e5);
+	delete[] v;
+}
+
+void test_max_secv_entitati_egale()
+{
+	int start, end;
+	Repository repo;
+	Entitate c1(4, 5);
+	Entitate c2(-4, 5);
+	max_secv_entitati_egale(repo, start, end);
+	assert(start == 0);
+	assert(end == 0);
+
+	Entitate e1(1, 2);
+	Entitate e2(1, 2);
+	Entitate e3(3, 2);
+	Entitate e4(1, 2);
+	repo.add(e1);
+	repo.add(e2);
+	repo.add(e3);
+	repo.add(e4);
+	max_secv_entitati_egale(repo, start, end);
+	assert(start == 0);
+	assert(end == 1);
+
+	Entitate e5(2, 2);
+	Entitate e6(1, 2);
+	Entitate e7(1, 2);
+	Entitate e8(1, 2);
+	repo.add(e5);
+	repo.add(e6);
+	repo.add(e7);
+	repo.add(e8);
+	max_secv_entitati_egale(repo, start, end);
+	assert(start == 5);
+	assert(end == 7);
 }
 
 void my_tests()
@@ -154,6 +209,7 @@ void my_tests()
 	test_arithmetic_operators();
 	test_repo();
 	test_biggestEntity();
-	//test_allInFirstQuadrant();
+	test_all_in_first_quadrant();
+	test_max_secv_entitati_egale();
 	cout << "Toate testele au trecut cu succes!" << endl;
 }

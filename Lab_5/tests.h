@@ -6,5 +6,6 @@ void test_operators();
 void test_arithmetic_operators();
 void test_repo();
 void test_biggestEntity();
-void test_allInFirstQuadrant();
+void test_all_in_first_quadrant();
+void test_max_secv_entitati_egale();
 void my_tests();

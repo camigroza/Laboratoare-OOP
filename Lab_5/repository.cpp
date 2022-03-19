@@ -21,8 +21,11 @@ Repository::Repository()
 
 Repository::~Repository()
 {
-	if (entitati) 
+	if (this->entitati != nullptr)
+	{
 		delete[] this->entitati;
+		this->entitati = nullptr;
+	}
 }
 
 int Repository::getNrEntitati()
@@ -50,7 +53,7 @@ void Repository::remove(Entitate& e)
 			entitati[i] = entitati[i + 1];
 		nr_entitati--;
 	}
-	else cout << "Nu exista numarul complex dat!\n";
+	else cout << "\tNu exista numarul complex dat!\n";
 }
 
 Entitate Repository::elemAt(int poz)
@@ -77,3 +80,4 @@ Entitate& Repository::biggestEntity()
 		if (this->elemAt(i) > maxim) maxim = this->elemAt(i);
 	return maxim;
 }
+

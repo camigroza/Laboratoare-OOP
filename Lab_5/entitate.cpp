@@ -111,15 +111,15 @@ bool Entitate::operator>(const Entitate& c)
 
 void Entitate::readEntitate()
 {
-	cout << "Dati valoarea partii reale: ";
+	cout << "\tDati valoarea partii reale: ";
 	cin >> this->parte_reala;
-	cout << "Dati valoarea partii imaginare: ";
+	cout << "\tDati valoarea partii imaginare: ";
 	cin >> this->parte_imaginara;
 }
 
 void Entitate::writeEntitate()
 {
-	cout << "Numarul complex este: ";
+	cout << "\tNumarul complex: ";
 	if (this->parte_imaginara != 0)
 		cout << this->parte_reala << " + " << this->parte_imaginara << "i" << endl;
 	else cout << this->parte_reala << endl;
