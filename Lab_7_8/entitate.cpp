@@ -55,7 +55,7 @@ int Entitate::getSuma()
 	return this->suma;
 }
 
-const char* Entitate::getTip()
+char* Entitate::getTip()
 {
 	return this->tip;
 }

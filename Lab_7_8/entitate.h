@@ -25,7 +25,7 @@ public:
 	//getteri
 	int getZiua();
 	int getSuma();
-	const char* getTip();
+	char* getTip();
 
 	//overload la operatori
 	Entitate& operator=(const Entitate& e);

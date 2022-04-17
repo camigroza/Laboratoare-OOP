@@ -3,6 +3,16 @@
 #include <algorithm>
 using namespace std;
 
+string convertToString(char* a, int size)
+{
+	int i;
+	string s = "";
+	for (i = 0; i < size; i++) {
+		s = s + a[i];
+	}
+	return s;
+}
+
 int currentDay()
 {
 	time_t rawtime;
@@ -28,7 +38,14 @@ void UI::addCheltuiala()
 	char* tip = new char[20];
 	cout << "--> tipul: ";
 	cin >> tip;
+	string xx;
+	xx = convertToString(tip, 20);
 	Entitate e(ziua, suma, tip);
+	this->list_undo.push_back("remove");
+	this->zile.push_back(ziua);
+	this->sume.push_back(suma);
+	this->tipuri.push_back(xx);
+	this->how_many.push_back(1);
 	int poz = -1;
 	for (int i = 0; i < size && poz == -1; i++)
 		if (all[i].getZiua() == ziua && strcmp(all[i].getTip(), tip) == 0) poz = i;
@@ -93,24 +110,38 @@ void UI::removeCheltuiala()
 	char* tip = new char[20];
 	cout << "--> prima zi: ";
 	cin >> s;
+	int cate;
 	if (strcmp(s, "-") == 0)
 	{
 		gasit = 0;
 		cout << "--> tipul: ";
 		cin >> tip;
+		cate = 0;
 		for (int i = 0; i < size; i++)
 			if (strcmp(all[i].getTip(), tip) == 0)
 			{
 				gasit = 1;
+				cate++;
+				this->list_undo.push_back("add");
+				this->zile.push_back(all[i].getZiua());
+				this->sume.push_back(all[i].getSuma());
+				string xx;
+				xx = convertToString(all[i].getTip(), 20);
+				this->tipuri.push_back(xx);
+				this->how_many.push_back(1);
 				this->service.removeEntity(all[i].getZiua(), all[i].getSuma(), all[i].getTip());
 			}
 		if (gasit == 1)
+		{
+			this->how_many.push_back(cate);
 			cout << "\tToate cheltuielile pentru '" << tip << "' au fost sterse cu succes!\n";
+		}
 		else cout << "\tNu s-au gasit cheltuieli pentru '" << tip << "'!\n";
 	}
 	else
 	{
 		gasit = 0;
+		cate = 0;
 		ziua1 = atoi(s);
 		cout << "--> ultima zi: ";
 		cin >> s;
@@ -120,10 +151,20 @@ void UI::removeCheltuiala()
 				if (all[i].getZiua() == ziua1)
 				{
 					gasit = 1;
+					cate++;
+					this->list_undo.push_back("add");
+					this->zile.push_back(all[i].getZiua());
+					this->sume.push_back(all[i].getSuma());
+					string xx;
+					xx = convertToString(all[i].getTip(), 20);
+					this->tipuri.push_back(xx);
 					this->service.removeEntity(all[i].getZiua(), all[i].getSuma(), all[i].getTip());
 				}
 			if (gasit == 1)
+			{
+				this->how_many.push_back(cate);
 				cout << "\tToate cheltuielile din ziua " << ziua1 << " au fost sterse cu succes!\n";
+			}
 			else cout << "\tNu s-au gasit cheltuieli pentru ziua " << ziua1 << "!\n";
 		}
 		else
@@ -131,14 +172,25 @@ void UI::removeCheltuiala()
 			ziua2 = atoi(s);
 			if (ziua1 > ziua2) swap(ziua1, ziua2);
 			gasit = 0;
+			cate = 0;
 			for (int i = 0; i < size; i++)
 				if (all[i].getZiua() >= ziua1 && all[i].getZiua() <= ziua2)
 				{
 					gasit = 1;
+					cate++;
+					this->list_undo.push_back("add");
+					this->zile.push_back(all[i].getZiua());
+					this->sume.push_back(all[i].getSuma());
+					string xx;
+					xx = convertToString(all[i].getTip(), 20);
+					this->tipuri.push_back(xx);
 					this->service.removeEntity(all[i].getZiua(), all[i].getSuma(), all[i].getTip());
 				}
 			if (gasit == 1)
+			{
+				this->how_many.push_back(cate);
 				cout << "\tToate cheltuielile din zilele " << ziua1 << ",...," << ziua2 << " au fost sterse cu succes!\n";
+			}
 			else cout << "\tNu au fost gasite cheltuieli pentru zilele " << ziua1 << ",...," << ziua2 << " !\n";
 		}
 	}
@@ -394,11 +446,24 @@ void UI::filterCheltuieli()
 	cin >> tip;
 	cout << "--> </=: ";
 	cin >> s;
+	int cate;
 	if (strcmp(s, "-") == 0)
 	{
+		cate = 0;
 		for (int i = 0; i < size; i++)
 			if (strcmp(all[i].getTip(), tip) != 0)
+			{
+				cate++;
+				this->list_undo.push_back("add");
+				this->zile.push_back(all[i].getZiua());
+				this->sume.push_back(all[i].getSuma());
+				string xx;
+				xx = convertToString(all[i].getTip(), 20);
+				this->tipuri.push_back(xx);
 				this->service.getRepo().remove(all[i]);
+			}
+		if (cate != 0)
+			this->how_many.push_back(cate);
 		Entitate* all_after = this->service.getRepo().getAll();
 		int size_after = this->service.getRepo().getSize();
 		if (size_after == 0)
@@ -417,9 +482,21 @@ void UI::filterCheltuieli()
 		cin >> suma;
 		if (strcmp(s, "<") == 0)
 		{
+			cate = 0;
 			for (int i = 0; i < size; i++)
 				if (!(all[i].getSuma() < suma && strcmp(tip, all[i].getTip()) == 0))
+				{
+					cate++;
+					this->list_undo.push_back("add");
+					this->zile.push_back(all[i].getZiua());
+					this->sume.push_back(all[i].getSuma());
+					string xx;
+					xx = convertToString(all[i].getTip(), 20);
+					this->tipuri.push_back(xx);
 					this->service.getRepo().remove(all[i]);
+				}
+			if (cate != 0)
+				this->how_many.push_back(cate);
 			Entitate* all_after = this->service.getRepo().getAll();
 			int size_after = this->service.getRepo().getSize();
 			if (size_after == 0)
@@ -433,9 +510,21 @@ void UI::filterCheltuieli()
 		}
 		else if (strcmp(s, "=") == 0)
 		{
+			cate = 0;
 			for (int i = 0; i < size; i++)
 				if (!(all[i].getSuma() == suma && strcmp(tip, all[i].getTip()) == 0))
+				{
+					cate++;
+					this->list_undo.push_back("add");
+					this->zile.push_back(all[i].getZiua());
+					this->sume.push_back(all[i].getSuma());
+					string xx;
+					xx = convertToString(all[i].getTip(), 20);
+					this->tipuri.push_back(xx);
 					this->service.getRepo().remove(all[i]);
+				}
+			if (cate != 0)
+				this->how_many.push_back(cate);
 			Entitate* all_after = this->service.getRepo().getAll();
 			int size_after = this->service.getRepo().getSize();
 			if (size_after == 0)
@@ -449,6 +538,45 @@ void UI::filterCheltuieli()
 		}
 	}
 	delete[] tip;
+}
+
+void UI::undo()
+{
+	if (this->list_undo.size() != 0)
+	{
+		int ziua;
+		int suma;
+		char tip[20];
+		int n_lu = this->list_undo.size();
+		int n_hm = this->how_many.size();
+		int n = this->how_many[n_hm - 1];
+		for (int i = 1; i <= n; i++)
+		{
+			ziua = this->zile[n_lu - i];
+			suma = this->sume[n_lu - i];
+			strcpy_s(tip, this->tipuri[n_lu - i].c_str());
+			Entitate e(ziua, suma, tip);
+
+			if (this->list_undo[n_lu - i] == "add")
+			{	
+				this->service.getRepo().add(e);
+				this->list_undo.pop_back();
+				this->zile.pop_back();
+				this->sume.pop_back();
+				this->tipuri.pop_back();
+			}
+			else if (this->list_undo[n_lu - 1] == "remove")
+			{
+				this->service.getRepo().remove(e);
+				this->list_undo.pop_back();
+				this->zile.pop_back();
+				this->sume.pop_back();
+				this->tipuri.pop_back();
+			}
+		}
+		this->how_many.pop_back();
+	}
+	else cout << "\tNu se poate face undo!\n";
 }
 
 UI::UI()
@@ -546,7 +674,7 @@ void UI::runMenu()
 		}
 		else if (optiune == 'u')
 		{
-
+			this->undo();
 		}
 		else if (optiune == 'x') break;
 		else cout << "\tOptiune gresita! Reincercati: \n";

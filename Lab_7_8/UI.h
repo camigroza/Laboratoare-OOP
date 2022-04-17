@@ -1,9 +1,15 @@
 #pragma once
 #include "service.h"
+#include <string.h>
 
 class UI {
 private:
 	Service service;
+	vector<string> list_undo;
+	vector<int> zile;
+	vector<int> sume;
+	vector<string> tipuri;
+	vector<int> how_many;
 	void addCheltuiala();
 	void insertCheltuiala();
 	void removeCheltuiala();
