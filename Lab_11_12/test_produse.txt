@@ -1,0 +1,1 @@
+Cod: 123; Nume: aaa; Pret: 10
