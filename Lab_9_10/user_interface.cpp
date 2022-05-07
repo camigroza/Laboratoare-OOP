@@ -7,15 +7,20 @@ void UI::adauga_produs()
 	cout << "Dati codul produsului: ";
 	int cod;
 	cin >> cod;
-	cin.get();
-	cout << "Dati numele produsului: ";
-	string nume;
-	getline(cin, nume);
-	cout << "Dati pretul produsului: ";
-	double pret;
-	cin >> pret;
-	this->service.addEntity(cod, nume, pret);
-	cout<<"\tProdusul a fost adaugat cu succes!\n";
+	if (this->service.getRepo().searchByCode(cod) == true)
+		cout << "\tExista deja un produs cu codul dat! Codurile trebuie sa fie unice!\n";
+	else
+	{
+		cin.get();
+		cout << "Dati numele produsului: ";
+		string nume;
+		getline(cin, nume);
+		cout << "Dati pretul produsului: ";
+		double pret;
+		cin >> pret;
+		this->service.addEntity(cod, nume, pret);
+		cout << "\tProdusul a fost adaugat cu succes!\n";
+	}
 }
 
 void UI::sterge_produs()
@@ -33,19 +38,22 @@ void UI::modifica_produs()
 	cout << "Dati codul produsului de modificat: ";
 	int cod;
 	cin >> cod;
-	cin.get();
-	cout << "Dati noul nume al produsului: ";
-	string nume_nou;
-	getline(cin, nume_nou);
-	cout << "Dati noul pret al produsului: ";
-	double pret_nou;
-	cin >> pret_nou;
 	if (this->service.getRepo().searchByCode(cod) == false)
 		cout << "\tNu exista nici un produs cu codul dat!\n";
 	else
 	{
+		cout << "Dati noul cod al produsului: ";
+		int cod_nou;
+		cin >> cod_nou;
+		cin.get();
+		cout << "Dati noul nume al produsului: ";
+		string nume_nou;
+		getline(cin, nume_nou);
+		cout << "Dati noul pret al produsului: ";
+		double pret_nou;
+		cin >> pret_nou;
 		Entity e = this->service.getRepo().findByCode(cod);
-		int ok = this->service.updateEntity(cod, e.getNume(), e.getPret(), nume_nou, pret_nou);
+		int ok = this->service.updateEntity(cod, e.getNume(), e.getPret(), cod_nou, nume_nou, pret_nou);
 		if (ok == 1) cout << "\tProdusul a fost modificat cu succes!\n";
 	}
 }
@@ -63,6 +71,81 @@ void UI::afiseaza_produse()
 	}
 }
 
+void UI::afiseaza_bani()
+{
+	map<int, int>::iterator it;
+	map<int, int> all = this->service.getCoins();
+	if (all.size() == 0)
+		cout << "\tNu sunt bani in tonomat!\n";
+	for (it = all.begin(); it != all.end(); ++it)
+		cout << "\t" << it->first << ": " << it->second << endl;
+}
+
+void UI::achizitioneaza_produs()
+{
+	cout << "Dati codul produsului pe care doriti sa il achizitionati: ";
+	int cod;
+	cin >> cod;
+	if (this->service.getRepo().searchByCode(cod) == false)
+		cout << "\tNu exista un produs cu codul dat!\n";
+	else
+	{
+		int pret_produs = this->service.getRepo().findByCode(cod).getPret();
+		cout << "Introduceti bancnota: ";
+		int valoare_bancnota_introdusa;
+		cin >> valoare_bancnota_introdusa;
+		if (valoare_bancnota_introdusa < pret_produs)
+			cout << "\tNu ati introdus suficienti bani!\n";
+		else
+		{
+			int rest = valoare_bancnota_introdusa - pret_produs;
+			map<int, int> M;
+			if (this->service.enoughMoneyToGiveBack(rest, M) == false)
+				cout << "\tNe pare rau, dar nu putem sa va dam rest. Va primiti banii inapoi!\n";
+			else
+			{
+				this->service.removeEntity(cod);
+				this->service.addCoins(valoare_bancnota_introdusa, 1);
+				map<int, int>::iterator it;
+				for (it = M.begin(); it != M.end(); it++)
+					this->service.removeCoins(it->first, it->second);
+				cout << "\tMultumim pentru achizitie! :)\n";
+			}
+		}
+	}
+}
+
+void UI::sort_by_price()
+{
+	string s;
+	cout << "--> crescator/descrescator: ";
+	cin >> s;
+	if (s == "crescator")
+	{
+		vector<Entity> all = this->service.sortAscendentByPrice();
+		if (all.size() == 0)
+			cout << "\tNu exista produse!\n";
+		else
+		{
+			cout << "\tProdusele ordonate crescator dupa pret sunt:\n";
+			for (Entity& e : all)
+				cout << "\t" << e << endl;
+		}
+	}
+	else if (s == "descrescator")
+	{
+		vector<Entity> all = this->service.sortDescendentByPrice();
+		if (all.size() == 0)
+			cout << "\tNu exista produse!\n";
+		else
+		{
+			cout << "\tProdusele ordonate descrescator dupa pret sunt:\n";
+			for (Entity& e : all)
+				cout << "\t" << e << endl;
+		}
+	}
+}
+
 UI::UI()
 {
 }
@@ -74,13 +157,26 @@ UI::UI(const Service& s)
 
 void UI::runMenu()
 {
+	map<int, int> m;
+	m.insert(pair<int, int>(1, 10));
+	m.insert(pair<int, int>(5, 5));
+	m.insert(pair<int, int>(10, 10));
+	m.insert(pair<int, int>(50, 2));
+	m.insert(pair<int, int>(100, 1));
+	this->service.setCoins(m);
+	this->service.addEntity(1, "corn", 5);
+	this->service.addEntity(2, "ciocolata", 8);
+	this->service.addEntity(3, "jeleu", 3);
 	char optiune;
 	while (true)
 	{
 		cout << "1. Adauga produs\n";
 		cout << "2. Elimina produs\n";
 		cout << "3. Modifica produs\n";
+		cout << "4. Achizitioneaza produs\n";
+		cout << "5. Sorteaza produsele dupa pret\n";
 		cout << "a. Afiseaza toate produsele\n";
+		cout << "A. Afiseaza banii disponibili in tonomat\n";
 		cout << "x. Iesire\n";
 
 		cout << "Dati optiunea: ";
@@ -92,8 +188,14 @@ void UI::runMenu()
 			this->sterge_produs();
 		else if (optiune == '3')
 			this->modifica_produs();
+		else if (optiune == '4')
+			this->achizitioneaza_produs();
+		else if (optiune == '5')
+			this->sort_by_price();
 		else if (optiune == 'a')
 			this->afiseaza_produse();
+		else if (optiune == 'A')
+			this->afiseaza_bani();
 		else if (optiune == 'x')
 			break;
 		else cout << "\tOptiune gresita! Reincercati:\n";

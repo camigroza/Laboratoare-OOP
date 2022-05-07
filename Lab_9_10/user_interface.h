@@ -8,6 +8,9 @@ private:
 	void sterge_produs();
 	void modifica_produs();
 	void afiseaza_produse();
+	void afiseaza_bani();
+	void achizitioneaza_produs();
+	void sort_by_price();
 
 public:
 	UI();

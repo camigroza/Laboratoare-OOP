@@ -4,7 +4,7 @@
 using namespace std;
 
 class Repository {
-private:
+protected:
 	vector<Entity> elems;
 
 public:
